@@ -25,7 +25,7 @@ class PlaylistWidget(QWidget):
 
         # Empty playlist (no items initially)
         self.playlist_widget = QListWidget(self)
-        self.playlist_widget.setStyleSheet("QListWidget { border: none; }")  # No borders
+        # self.playlist_widget.setStyleSheet("QListWidget { border: none; }")  # No borders
 
         # Set the background color of the widget to black
         self.setStyleSheet("background-color: black;")

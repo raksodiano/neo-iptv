@@ -64,17 +64,14 @@ class MainWindow(QMainWindow):
 
         video_layout = QVBoxLayout()
         self.video_widget = VideoPlayerWidget(self)
-        # self.video_widget.setFixedSize(640, 360)
         video_layout.addWidget(self.video_widget)
 
-        # Control buttons widget (imported from control_buttons_widget.py)
+        # Control buttons widget
         self.control_buttons_widget = ControlButtonsWidget(self)
-        # self.control_buttons_widget.setFixedHeight(100)
         video_layout.addWidget(self.control_buttons_widget)
 
-        # Playlist widget (imported from playlist_widget.py)
+        # Playlist widget
         self.playlist_widget = PlaylistWidget(self, self)
-        # self.playlist_widget.setFixedWidth(int(self.width() * 0.5))
         self.playlist_widget.setFixedWidth(400)
 
         # Add the video layout to the main layout
@@ -138,33 +135,8 @@ class MainWindow(QMainWindow):
 
         return super().eventFilter(obj, event)
 
-    # def resizeEvent(self, event):
-    #     """Called when the window is resized"""
-    #     new_width = event.size().width()  # Get the new width of the window
-    #     new_height = event.size().height()  # Get the new height of the window
-    #
-    #     # Set the playlist width to 30% of the window width (fixed)
-    #     playlist_width = int(new_width * 0.3)  # 30% for the playlist widget
-    #     self.playlist_widget.setFixedWidth(playlist_width)  # Set playlist widget width
-    #
-    #     # Adjust the video layout width to take up the remaining space
-    #     video_layout_width = new_width - playlist_width  # Remaining width for the video widget
-    #
-    #     # Ensure the video widget does not exceed the total width of the window
-    #     if video_layout_width > new_width:  # If the calculated width is larger than the window width
-    #         video_layout_width = new_width  # Limit the width to the window width
-    #
-    #     # Ensure that the video widget width is non-negative
-    #     if video_layout_width > 0:
-    #         self.video_widget.setFixedWidth(video_layout_width)  # Set video widget width
-    #     else:
-    #         self.video_widget.setFixedWidth(0)  # Prevent setting a negative width
-    #
-    #     # Set the video widget height to the full height of the window
-    #     self.video_widget.setFixedHeight(new_height)  # Keep the full height for the video widget
-
     def hide_widgets(self):
-        # Hide the buttons if the timer expires (after 10 seconds)
+        # Hide the buttons
         self.buttons_visible = False
         self.control_buttons_widget.setVisible(False)
         # self.playlist_widget.setVisible(False)
@@ -178,7 +150,6 @@ class MainWindow(QMainWindow):
     def play_iptv_channel(self):
         """Get the IPTV channel from the list and play it"""
         if self.video_control.iptv_channels:
-            # Play the first channel in the list (index 0)
             first_channel_url = self.video_control.iptv_channels[0]
             self.status_label.setText(f"Playing IPTV Channel: {first_channel_url}")
             self.video_control.play_iptv_channel(first_channel_url, self.video_widget)
