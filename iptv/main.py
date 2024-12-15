@@ -1,6 +1,8 @@
-import sys
 import os
+import sys
+
 from PyQt6.QtWidgets import QApplication
+
 from views.main_window import MainWindow
 
 # Ensure that the root project directory is in the PYTHONPATH

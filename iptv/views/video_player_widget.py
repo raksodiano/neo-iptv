@@ -1,14 +1,12 @@
-from PyQt6.QtWidgets import QWidget
+import vlc
 from PyQt6.QtCore import QTimer, Qt
 from PyQt6.QtGui import QPainter, QColor
-import vlc
+from PyQt6.QtWidgets import QSizePolicy, QWidget
 
 
 class VideoPlayerWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setStyleSheet("background-color: black;")  # Set black background
-
         # Create VLC instance and player
         self.vlc_instance = vlc.Instance('--vout=drm')  # Use drm output for better integration
         self.media_player = self.vlc_instance.media_player_new()
@@ -17,6 +15,8 @@ class VideoPlayerWidget(QWidget):
         self.update_timer = QTimer(self)
         self.update_timer.timeout.connect(self.update_video)
         self.update_timer.start(100)  # Update every 100 ms (~10 FPS)
+
+        self.setStyleSheet("background-color: black;")  # Set black background
 
         # Flag to track whether video is playing
         self.is_playing = False

@@ -1,4 +1,5 @@
 import vlc
+from config.channels import ChannelManager
 
 
 class VideoControl:
@@ -11,13 +12,24 @@ class VideoControl:
         self.video_list = []
         self.current_video_index = -1  # To track the current video
 
-        # IPTV channel list (can be manually added)
-        self.iptv_channels = [
-            "https://stmv1.srvif.com/animetv/animetv/playlist.m3u8",
-            "https://d1j2u714xk898n.cloudfront.net/v1/master/9d062541f2ff39b5c0f48b743c6411d25f62fc25/STIRR-MuxIP-24HourFreeMovies/145.m3u8",
-            "http://sochinskayatrk.ru/hdtv/hls/43Channel_hd/playlist.m3u8"
-        ]
+        self.channels = ChannelManager().channels
+        self.iptv_channels = [channel['url'] for channel in ChannelManager().channels if 'url' in channel]
+
+        # # IPTV channel list (can be manually added)
+        # self.iptv_channels = [
+        #     "https://stmv1.srvif.com/animetv/animetv/playlist.m3u8",
+        #     "https://d1j2u714xk898n.cloudfront.net/v1/master/9d062541f2ff39b5c0f48b743c6411d25f62fc25/STIRR-MuxIP-24HourFreeMovies/145.m3u8",
+        #     "http://sochinskayatrk.ru/hdtv/hls/43Channel_hd/playlist.m3u8"
+        # ]
         self.current_channel_index = -1
+
+    def play_channel(self, channel_id):
+        """Play a channel by ID"""
+        if self.channels:
+            channel = self.channels[channel_id]
+            print(f"Playing {channel['name']}")
+        else:
+            print("No channels available.")
 
     def play_video(self, video_path, video_widget):
         """Play selected video"""
@@ -92,3 +104,19 @@ class VideoControl:
 
             self.media_player.play()
             return channel_url
+
+    def play_iptv_channel_by_id(self, channel_id):
+        """Play IPTV channel by its ID."""
+        channel_url = self.get_channel_url_by_id(channel_id)
+
+        if channel_url:
+            print(f"Reproducing channel with ID {channel_id} and URL {channel_url}")
+        else:
+            print(f"Error: Channel with ID {channel_id} not found.")
+
+    def get_channel_url_by_id(self, channel_id):
+        """Retrieve the channel URL by ID (this is just an example)."""
+        for channel in self.channels:
+            if channel['id'] == channel_id:
+                return channel['url']
+        return None
