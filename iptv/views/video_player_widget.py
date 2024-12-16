@@ -1,7 +1,7 @@
 import vlc
 from PyQt6.QtCore import QTimer, Qt
 from PyQt6.QtGui import QPainter, QColor
-from PyQt6.QtWidgets import QSizePolicy, QWidget
+from PyQt6.QtWidgets import QWidget
 
 
 class VideoPlayerWidget(QWidget):
@@ -52,7 +52,8 @@ class VideoPlayerWidget(QWidget):
             # If video is playing, just ensure the widget is updated with the video
             super().paintEvent(event)
         else:
-            # If video is not yet playing, show a loading message
+            # If video is not yet playing, show a loading message  # Set black background
+            painter.fillRect(self.rect(), QColor(0, 0, 0))
             painter.setPen(QColor(255, 255, 255))  # Set text color to white
             painter.setFont(self.font())
             painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "Video is loading...")

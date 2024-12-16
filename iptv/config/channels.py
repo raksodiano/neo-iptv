@@ -15,7 +15,7 @@ class ChannelManager:
 
     @staticmethod
     def load_channels():
-        """Load channels from the JSON file"""
+        """Load channels from the file"""
         channels = load_channels()
         if channels:
             print(f"Loaded {len(channels)} channels.")

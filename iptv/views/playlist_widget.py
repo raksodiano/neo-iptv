@@ -75,14 +75,14 @@ class PlaylistWidget(QWidget):
         channel_name = item.text()
 
         # Find the channel's URL based on its name
-        selected_channel_url = next(
-            (channel['url'] for channel in self.channels if channel['name'] == channel_name), None
+        selected_channel = next(
+            (channel for channel in self.channels if channel['name'] == channel_name), None
         )
 
-        if selected_channel_url:
-            print(f"Channel {channel_name} clicked! ID: {selected_channel_url}")
+        if selected_channel:
+            print(f"Channel {channel_name} clicked! ID: {selected_channel['name']}")
 
             if self.main_window:
-                self.main_window.play_channel(selected_channel_url)
+                self.main_window.play_channel(selected_channel)
         else:
             print(f"Error: Channel '{channel_name}' not found.")

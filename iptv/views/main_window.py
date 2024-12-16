@@ -68,6 +68,7 @@ class MainWindow(QMainWindow):
 
         # Control buttons widget
         self.control_buttons_widget = ControlButtonsWidget(self)
+        self.control_buttons_widget.setFixedHeight(80)
         video_layout.addWidget(self.control_buttons_widget)
 
         # Playlist widget
@@ -141,27 +142,27 @@ class MainWindow(QMainWindow):
         self.control_buttons_widget.setVisible(False)
         # self.playlist_widget.setVisible(False)
 
-    def play_channel(self, channel_url):
+    def play_channel(self, channel):
         """Get the IPTV channel from the list and play it"""
-        if self.video_control.iptv_channels:
-            self.status_label.setText(f"Playing IPTV Channel: {channel_url}")
-            self.video_control.play_iptv_channel(channel_url, self.video_widget)
+        if self.video_control.channels:
+            self.status_label.setText(f"Channel: {channel['name']}")
+            self.video_control.play_iptv_channel(channel, self.video_widget)
 
     def play_iptv_channel(self):
         """Get the IPTV channel from the list and play it"""
-        if self.video_control.iptv_channels:
-            first_channel_url = self.video_control.iptv_channels[0]
-            self.status_label.setText(f"Playing IPTV Channel: {first_channel_url}")
-            self.video_control.play_iptv_channel(first_channel_url, self.video_widget)
+        if self.video_control.channels:
+            channel = self.video_control.channels[0]
+            self.status_label.setText(f"Channel: {channel['name']}")
+            self.video_control.play_iptv_channel(channel, self.video_widget)
 
     def play_previous_channel(self):
         # Use the VideoControl class to play the previous IPTV channel
         previous_channel = self.video_control.play_previous_channel(self.video_widget)
         if previous_channel:
-            self.status_label.setText(f"Playing: {previous_channel}")
+            self.status_label.setText(f"Channel: {previous_channel['name']}")
 
     def play_next_channel(self):
         # Use the VideoControl class to play the next IPTV channel
         next_channel = self.video_control.play_next_channel(self.video_widget)
         if next_channel:
-            self.status_label.setText(f"Playing: {next_channel}")
+            self.status_label.setText(f"Channel: {next_channel['name']}")

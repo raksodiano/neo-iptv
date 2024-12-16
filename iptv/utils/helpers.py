@@ -47,3 +47,16 @@ def load_channels():
     except Exception as e:
         print(f"Error: {str(e)}")  # Catch any other errors
         return None
+
+
+def get_channel_index_by_url(channels, current_channel_url):
+    """
+    Finds the index of a channel in the list based on its URL.
+
+    :param channels: List of channels (each channel is a dictionary or an object).
+    :param current_channel_url: URL of the current channel to search for.
+    :return: Index of the found channel, or -1 if it does not exist.
+    """
+    return next(
+        (i for i, channel in enumerate(channels) if channel['url'] == current_channel_url), -1
+    )

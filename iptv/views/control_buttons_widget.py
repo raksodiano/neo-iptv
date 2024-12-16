@@ -29,19 +29,19 @@ class ControlButtonsWidget(QWidget):
         self.next_button.setIcon(QIcon.fromTheme("media-seek-forward"))  # Icon for Next
 
         # Add tooltips to buttons
-        self.play_button.setToolTip("Play the video")  # Tooltip for play button
-        self.prev_button.setToolTip("Go to previous video")  # Tooltip for previous button
-        self.next_button.setToolTip("Go to next video")
+        self.play_button.setToolTip("Play the channel")
+        self.prev_button.setToolTip("Go to previous channel")
+        self.next_button.setToolTip("Go to next channel")
 
         # Set icon size (optional)
-        self.play_button.setIconSize(QSize(30, 30))  # Smaller icons
-        self.prev_button.setIconSize(QSize(30, 30))  # Smaller icons
-        self.next_button.setIconSize(QSize(30, 30))  # Smaller icons
+        self.play_button.setIconSize(QSize(15, 15))
+        self.prev_button.setIconSize(QSize(15, 15))
+        self.next_button.setIconSize(QSize(15, 15))
 
         # Adjust the button size to a more suitable size
-        self.play_button.setFixedSize(60, 60)  # Smaller button size
-        self.prev_button.setFixedSize(60, 60)  # Smaller button size
-        self.next_button.setFixedSize(60, 60)  # Smaller button size
+        self.play_button.setFixedSize(40, 40)
+        self.prev_button.setFixedSize(40, 40)
+        self.next_button.setFixedSize(40, 40)
 
         # Add buttons to the horizontal layout
         self.layout.addWidget(self.prev_button)
