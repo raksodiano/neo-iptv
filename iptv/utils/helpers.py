@@ -1,8 +1,10 @@
+from concurrent.futures import ThreadPoolExecutor
 import os
+import requests
 
 
 def load_channels():
-    """Load channels from an M3U playlist file."""
+    """Load channels from an M3U playlist file and filter out non-responsive URLs."""
     current_dir = os.path.dirname(__file__)  # Get the current directory
     database_dir = os.path.join(current_dir, '..', 'database')  # Go one level up and access the 'database' folder
     m3u_file_path = os.path.join(database_dir, 'index.m3u')  # Full path to the M3U file
@@ -39,6 +41,8 @@ def load_channels():
         if channels and channels[0]['url'] == '#EXTM3U':
             channels.pop(0)
 
+        # Filter out non-responsive URLs
+        channels = filter_responsive_channels(channels)
         return channels
 
     except FileNotFoundError:
@@ -47,6 +51,36 @@ def load_channels():
     except Exception as e:
         print(f"Error: {str(e)}")  # Catch any other errors
         return None
+
+
+def is_url_responsive(url):
+    """
+    Checks if a URL is responsive within a timeout period.
+    :param url: The URL to test.
+    :return: True if the URL is responsive, False otherwise.
+    """
+    try:
+        print(f"Ping: {url}")
+        response = requests.head(url, timeout=3)  # Perform a HEAD request
+        return response.status_code == 200  # Check if the status code indicates success
+    except requests.RequestException:
+        return False  # Any exception or timeout means the URL is not responsive
+
+
+def filter_responsive_channels(channels):
+    """
+    Filters out non-responsive channels by checking their URLs in parallel.
+    :param channels: List of channels.
+    :return: List of responsive channels.
+    """
+
+    def check_channel(channel):
+        return channel if is_url_responsive(channel['url']) else None
+
+    with ThreadPoolExecutor(max_workers=50) as executor:  # Use 50 threads
+        results = list(executor.map(check_channel, channels))
+
+    return [channel for channel in results if channel is not None]  # Remove None values
 
 
 def get_channel_index_by_url(channels, current_channel_url):
