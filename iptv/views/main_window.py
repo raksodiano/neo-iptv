@@ -1,6 +1,7 @@
 from PyQt6.QtCore import QTimer, QEvent
 from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QSizePolicy
 from logic.video_control import VideoControl
+from logic.volume_control import VolumeControl
 
 from .control_buttons_widget import ControlButtonsWidget
 from .video_player_widget import VideoPlayerWidget
@@ -18,8 +19,9 @@ class MainWindow(QMainWindow):
         # Center the window on the screen
         self.center_window()
 
-        # Initialize the VideoControl class to manage the video logic
+        # Initialize the Control class to manage the logic
         self.video_control = VideoControl()
+        self.volume_control = VolumeControl(self.video_control)
 
         # Set up UI components
         self.setup_ui()
@@ -91,7 +93,8 @@ class MainWindow(QMainWindow):
         self.control_buttons_widget.connect_buttons(
             self.play_iptv_channel,
             self.play_previous_channel,
-            self.play_next_channel
+            self.play_next_channel,
+            self.adjust_volume
         )
 
         # Ensure the video widget takes up the maximum available space
@@ -166,3 +169,8 @@ class MainWindow(QMainWindow):
         next_channel = self.video_control.play_next_channel(self.video_widget)
         if next_channel:
             self.status_label.setText(f"Channel: {next_channel['name']}")
+
+    def adjust_volume(self, value):
+        """Adjust the volume using the VolumeControl."""
+        self.volume_control.set_volume(value)
+        self.control_buttons_widget.update_volume_label(value)

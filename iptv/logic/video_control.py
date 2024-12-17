@@ -48,3 +48,8 @@ class VideoControl:
                 self.current_channel = next_channel
                 return self.play_iptv_channel(next_channel, video_widget)
         return None
+
+    def set_volume(self, volume):
+        """Set the volume of the VLC player."""
+        self.media_player.audio_set_volume(volume)
+        print(f"Volume set to {volume}%")

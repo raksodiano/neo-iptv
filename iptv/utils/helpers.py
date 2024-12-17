@@ -55,8 +55,6 @@ def load_channels():
         else:
             channels = channels_on_db
 
-        print(channels)
-
         # Filter out non-responsive URLs
         # channels = filter_responsive_channels(channels)
         return channels
