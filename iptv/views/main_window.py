@@ -103,8 +103,8 @@ class MainWindow(QMainWindow):
         )
 
         # Connect mouse movement events to detect mouse position
-        # self.central_widget.setMouseTracking(True)
-        # self.central_widget.installEventFilter(self)
+        self.central_widget.setMouseTracking(True)
+        self.central_widget.installEventFilter(self)
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Type.MouseMove:
@@ -118,9 +118,9 @@ class MainWindow(QMainWindow):
             threshold_right = screen_width * 0.6  # 70% of the window width (for PlaylistWidget)
 
             # Show the PlaylistWidget when the mouse is in the right 30% of the screen
-            # if mouse_pos.x() > threshold_right:
-            #     if not self.playlist_widget.isVisible():
-            #         self.playlist_widget.setVisible(True)
+            if mouse_pos.x() > threshold_right:
+                if not self.playlist_widget.isVisible():
+                    self.playlist_widget.setVisible(True)
 
             # Show the control buttons when the mouse is in the bottom 20% of the screen
             if mouse_pos.y() > threshold_bottom:
@@ -133,9 +133,9 @@ class MainWindow(QMainWindow):
                     self.hide_widgets_timer.stop()  # Stop the timer if the mouse leaves the area
 
             # If the mouse is not in the area for the PlaylistWidget, hide it
-            # if mouse_pos.x() < threshold_right:
-            #     if self.playlist_widget.isVisible():
-            #         self.playlist_widget.setVisible(False)
+            if mouse_pos.x() < threshold_right:
+                if self.playlist_widget.isVisible():
+                    self.playlist_widget.setVisible(False)
 
         return super().eventFilter(obj, event)
 
@@ -143,7 +143,7 @@ class MainWindow(QMainWindow):
         # Hide the buttons
         self.buttons_visible = False
         self.control_buttons_widget.setVisible(False)
-        # self.playlist_widget.setVisible(False)
+        self.playlist_widget.setVisible(False)
 
     def play_channel(self, channel):
         """Get the IPTV channel from the list and play it"""
