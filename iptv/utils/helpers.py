@@ -2,6 +2,8 @@ from concurrent.futures import ThreadPoolExecutor
 import os
 import requests
 
+from iptv.database.repository_channels import RepositoryChannel
+
 
 def load_channels():
     """Load channels from an M3U playlist file and filter out non-responsive URLs."""
@@ -41,8 +43,22 @@ def load_channels():
         if channels and channels[0]['url'] == '#EXTM3U':
             channels.pop(0)
 
+        db_channels = RepositoryChannel("database/my_channels.db")
+
+        channels_on_db = db_channels.get_channels()
+
+        if len(channels_on_db) < 1:
+            channels = filter_responsive_channels(channels)
+            # Insert each channel into the database
+            for channel in channels:
+                db_channels.create(channel["name"], channel["url"])
+        else:
+            channels = channels_on_db
+
+        print(channels)
+
         # Filter out non-responsive URLs
-        channels = filter_responsive_channels(channels)
+        # channels = filter_responsive_channels(channels)
         return channels
 
     except FileNotFoundError:
@@ -53,15 +69,26 @@ def load_channels():
         return None
 
 
-def is_url_responsive(url):
+def is_url_responsive(channel):
     """
-    Checks if a URL is responsive within a timeout period.
-    :param url: The URL to test.
+    Checks if a channel is responsive within a timeout period.
+    :param channel: The channel to test.
     :return: True if the URL is responsive, False otherwise.
     """
     try:
-        print(f"Ping: {url}")
-        response = requests.head(url, timeout=3)  # Perform a HEAD request
+        response = requests.head(channel['url'], timeout=5)  # Perform a HEAD request
+
+        # Determine the color based on the status_code
+        if response.status_code == 200:
+            color = "\033[32m"  # Green for status_code 200
+        else:
+            color = "\033[31m"  # Red for any other status_code
+
+        # Reset the color for subsequent text
+        reset_color = "\033[0m"
+
+        print(f"Status Code: {response.status_code}, Ping: {color}{channel.get('name', 'Unknown')}{reset_color}")
+
         return response.status_code == 200  # Check if the status code indicates success
     except requests.RequestException:
         return False  # Any exception or timeout means the URL is not responsive
@@ -75,9 +102,9 @@ def filter_responsive_channels(channels):
     """
 
     def check_channel(channel):
-        return channel if is_url_responsive(channel['url']) else None
+        return channel if is_url_responsive(channel) else None
 
-    with ThreadPoolExecutor(max_workers=50) as executor:  # Use 50 threads
+    with ThreadPoolExecutor(max_workers=100) as executor:  # Use 100 threads
         results = list(executor.map(check_channel, channels))
 
     return [channel for channel in results if channel is not None]  # Remove None values
