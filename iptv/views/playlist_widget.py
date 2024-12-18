@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QListWidget, QScrollArea, QLabel
-from logic.video_control import VideoControl
-from config.channels import ChannelManager
+from iptv.logic.video_control import VideoControl
+from iptv.config.channels import ChannelManager
 
 
 class PlaylistWidget(QWidget):

@@ -7,7 +7,7 @@ locale.setlocale(locale.LC_NUMERIC, 'C')
 
 from PyQt6.QtWidgets import QApplication
 
-from views.main_window import MainWindow
+from iptv.views.main_window import MainWindow
 
 # Ensure that the root project directory is in the PYTHONPATH
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))

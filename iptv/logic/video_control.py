@@ -1,6 +1,6 @@
 import mpv
-from config.channels import ChannelManager
-from utils.helpers import get_channel_index_by_url
+from iptv.config.channels import ChannelManager
+from iptv.utils.helpers import get_channel_index_by_url
 
 
 class VideoControl:

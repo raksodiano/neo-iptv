@@ -1,11 +1,11 @@
 from PyQt6.QtCore import QTimer, QEvent
 from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QSizePolicy
-from logic.video_control import VideoControl
-from logic.volume_control import VolumeControl
+from iptv.logic.video_control import VideoControl
+from iptv.logic.volume_control import VolumeControl
 
-from .control_buttons_widget import ControlButtonsWidget
-from .video_player_widget import VideoPlayerWidget
-from .playlist_widget import PlaylistWidget
+from iptv.views.control_buttons_widget import ControlButtonsWidget
+from iptv.views.video_player_widget import VideoPlayerWidget
+from iptv.views.playlist_widget import PlaylistWidget
 
 
 class MainWindow(QMainWindow):

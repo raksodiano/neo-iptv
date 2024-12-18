@@ -1,4 +1,4 @@
-from utils.helpers import load_channels
+from iptv.utils.helpers import load_channels
 
 
 class ChannelManager:
