@@ -121,7 +121,7 @@ class MainWindow(QMainWindow):
                 if not self.playlist_widget.isVisible():
                     self.playlist_widget.setVisible(True)
 
-            # Show the control buttons when the mouse is in the bottom 20% of the screen
+            # Show the controls buttons when the mouse is in the bottom 20% of the screen
             if mouse_pos.y() > threshold_bottom:
                 if not self.control_buttons_widget.isVisible():
                     self.control_buttons_widget.setVisible(True)

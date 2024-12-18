@@ -3,7 +3,7 @@ from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QSpacerItem, QSizePolicy, QSlider, QLabel
 
 
-class ControlButtonsWidget(QWidget):
+class ControlButtons(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 

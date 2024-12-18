@@ -1,23 +1,18 @@
 import mpv
 from PyQt6.QtCore import QTimer, Qt
 from PyQt6.QtGui import QPainter, QColor
-from PyQt6.QtWidgets import QWidget, QVBoxLayout
+from PyQt6.QtWidgets import QWidget
 
 
-class VideoPlayerWidget(QWidget):
+class VideoPlayer(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.container = QWidget(self)
         self.setAttribute(Qt.WidgetAttribute.WA_DontCreateNativeAncestors)
         self.setAttribute(Qt.WidgetAttribute.WA_NativeWindow)
 
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.container)
-
         self.mpv_player = mpv.MPV(
-            wid=str(int(self.container.winId())),
-            vo='x11',
+            wid=str(self.winId()),  # Usar el winId directamente como cadena
             log_handler=print,
             loglevel='debug'
         )
