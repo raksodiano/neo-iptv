@@ -1,5 +1,9 @@
 import os
 import sys
+import locale
+
+os.environ["LC_NUMERIC"] = "C"
+locale.setlocale(locale.LC_NUMERIC, 'C')
 
 from PyQt6.QtWidgets import QApplication
 

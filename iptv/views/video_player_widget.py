@@ -1,4 +1,4 @@
-import vlc
+import mpv
 from PyQt6.QtCore import QTimer, Qt
 from PyQt6.QtGui import QPainter, QColor
 from PyQt6.QtWidgets import QWidget
@@ -7,59 +7,64 @@ from PyQt6.QtWidgets import QWidget
 class VideoPlayerWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        # Create VLC instance and player
-        self.vlc_instance = vlc.Instance('--vout=drm')  # Use drm output for better integration
-        self.media_player = self.vlc_instance.media_player_new()
 
-        # Timer to refresh widget and update the paintEvent
+        self.setAttribute(Qt.WidgetAttribute.WA_DontCreateNativeAncestors)
+        self.setAttribute(Qt.WidgetAttribute.WA_NativeWindow)
+
+        self.mpv_player = mpv.MPV(
+            wid=str(int(self.winId())),
+            log_handler=print,
+            loglevel='debug'
+        )
+
+        # Timer para refrescar el widget y actualizar el paintEvent
         self.update_timer = QTimer(self)
         self.update_timer.timeout.connect(self.update_video)
-        self.update_timer.start(100)  # Update every 100 ms (~10 FPS)
+        self.update_timer.start(100)  # Actualizar cada 100 ms (~10 FPS)
 
-        self.setStyleSheet("background-color: black;")  # Set black background
+        self.setStyleSheet("background-color: black;")  # Establecer fondo negro
 
-        # Flag to track whether video is playing
+        # Bandera para verificar si el video está reproduciéndose
         self.is_playing = False
 
     def set_media_player(self, media_player):
-        """Sets the VLC media player for video rendering in this widget"""
-        self.media_player = media_player
-        self.media_player.set_xwindow(int(self.winId()))  # Associate VLC player with this widget
+        """Establece el reproductor MPV para la renderización del video en este widget"""
+        self.mpv_player = media_player
+        self.mpv_player.prepare_async = True  # Permite preparación asincrónica
 
     def play_media(self, media_url):
-        """Play video or IPTV stream"""
-        media = self.vlc_instance.media_new(media_url)
-        self.media_player.set_media(media)
-        self.media_player.play()
+        """Reproducir video o transmisión IPTV"""
+        self.mpv_player.play(media_url)
         self.is_playing = True
 
     def stop_media(self):
-        """Stop video playback"""
-        self.media_player.stop()
+        """Detener la reproducción del video"""
+        self.mpv_player.stop()
         self.is_playing = False
 
     def update_video(self):
-        """Update the widget and render video"""
+        """Actualizar el widget y renderizar el video"""
         if self.is_playing:
-            self.update()  # Trigger the paintEvent to redraw the widget
+            self.update()  # Forzar el paintEvent para redibujar el widget
 
     def paintEvent(self, event):
-        """Custom paint event to show content while video is loading"""
+        """Evento de pintura personalizado para mostrar contenido mientras el video se está cargando"""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
         if self.is_playing:
-            # If video is playing, just ensure the widget is updated with the video
+            # Si el video se está reproduciendo, actualizar el widget con el video
             super().paintEvent(event)
         else:
-            # If video is not yet playing, show a loading message  # Set black background
+            # Si el video no se está reproduciendo, mostrar mensaje de carga
             painter.fillRect(self.rect(), QColor(0, 0, 0))
-            painter.setPen(QColor(255, 255, 255))  # Set text color to white
+            painter.setPen(QColor(255, 255, 255))  # Establecer color del texto en blanco
             painter.setFont(self.font())
             painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "Video is loading...")
 
     def resizeEvent(self, event):
-        """Ensure video is resized with the widget"""
+        """Asegurarse de que el video se redimensione junto con el widget"""
         super().resizeEvent(event)
         if self.is_playing:
-            self.media_player.set_xwindow(int(self.winId()))  # Reassociate the window if resizing
+            # Sin necesidad de reasociar, MPV manejará la redimensión automáticamente
+            self.mpv_player.set_property('geometry', f"{self.width()}x{self.height()}+0+0")

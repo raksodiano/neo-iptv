@@ -1,16 +1,14 @@
-import vlc
+import mpv
 from config.channels import ChannelManager
 from utils.helpers import get_channel_index_by_url
 
 
 class VideoControl:
     def __init__(self):
-        # Initialize VLC
-        self.vlc_instance = vlc.Instance()
-        self.media_player = self.vlc_instance.media_player_new()
+        # Inicializar MPV
+        self.mpv_player = mpv.MPV()
 
         self.current_channel = None
-
         self.channels = ChannelManager().channels
 
     def play_iptv_channel(self, channel, video_widget):
@@ -18,13 +16,13 @@ class VideoControl:
         if channel:
             print(channel)
             self.current_channel = channel
-            media = self.vlc_instance.media_new(channel['url'])
-            self.media_player.set_media(media)
 
-            # Pass the media player to the VideoPlayerWidget for rendering
-            video_widget.set_media_player(self.media_player)
+            # Cargar la URL del canal en MPV
+            self.mpv_player.play(channel['url'])
 
-            self.media_player.play()
+            # Pasar el reproductor de MPV al widget de video para la renderización
+            video_widget.set_media_player(self.mpv_player)
+
             return channel
 
     def play_previous_channel(self, video_widget):
@@ -50,6 +48,6 @@ class VideoControl:
         return None
 
     def set_volume(self, volume):
-        """Set the volume of the VLC player."""
-        self.media_player.audio_set_volume(volume)
+        """Set the volume of the MPV player."""
+        self.mpv_player.volume = volume
         print(f"Volume set to {volume}%")

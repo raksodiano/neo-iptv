@@ -14,7 +14,6 @@ class MainWindow(QMainWindow):
 
         # Set up the main window
         self.setWindowTitle("Neo IPTV")
-        self.setGeometry(100, 100, 800, 600)  # Size of the window
 
         # Center the window on the screen
         self.center_window()
