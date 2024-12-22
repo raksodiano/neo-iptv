@@ -1,0 +1,43 @@
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Distribution/Packaging
+*.egg
+*.egg-info
+dist/
+build/
+eggs/
+lib/
+lib64/
+python*/.installed.cfg
+python*/lib/python*/site-packages/
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs and editors
+# PyCharm
+.idea/
+
+# VSCode
+.vscode/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# MacOS files
+.DS_Store
+
+# Windows files
+Thumbs.db
+
+# Logs and databases
+*.log
+*.sqlite3
