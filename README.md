@@ -57,7 +57,7 @@ Once the dependencies are installed, you can run the application. Make sure the 
 then run the following command:
 
 ```bash 
-python iptv
+python -m iptv
 ```
 
 ### License
