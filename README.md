@@ -26,9 +26,8 @@ commands:
 #### Install Python 3 and MPV:
 
 ```bash
-sudo zypper refresh
 sudo zypper install python3 python3-pip
-sudo zypper install mpv
+sudo zypper install mpv mpv-devel
 ```
 
 ### 2. Create and activate a virtual environment
