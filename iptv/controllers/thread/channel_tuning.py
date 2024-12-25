@@ -1,7 +1,8 @@
-from PyQt6.QtCore import QThread, pyqtSignal
-from concurrent.futures import ThreadPoolExecutor
-import time
 import random
+import time
+from concurrent.futures import ThreadPoolExecutor
+
+from PyQt6.QtCore import QThread, pyqtSignal
 
 from iptv.controllers.helpers import is_url_responsive
 from iptv.models.database.channel import Channel
@@ -49,10 +50,9 @@ class ChannelTuningThread(QThread):
         """
         Checks if a channel is responsive and updates its status in the database.
         """
-        if not is_url_responsive(channel, 3):
-            print(f"Offline channel: {channel.name}")
+        if not is_url_responsive(channel):
             Channel.update_channel(channel.id, {"tuned": False})
         else:
-            print(f"Online channel: {channel.name}")
             Channel.update_channel(channel.id, {"tuned": True})
+            
         return channel

@@ -4,7 +4,7 @@ from .database.channel import Channel
 class ChannelManager:
     _instance = None
     _channels = None
-    _current_channel = None  # Variable para almacenar el canal actual
+    _current_channel = None
 
     @classmethod
     def get_instance(cls):
@@ -19,6 +19,12 @@ class ChannelManager:
             print("Loading channels from database...")
             self._channels = Channel.get_all_channels()
         return self._channels
+
+    def refresh(self):
+        """ Force the instance to reload all data from the database """
+        self._channels = None
+        self._current_channel = None
+        self.load_channels()
 
     def get_channels(self):
         """ Get the loaded channels, or load them if not loaded yet """

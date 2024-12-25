@@ -9,6 +9,7 @@ class EventBus(QObject):
     mute_toggled = pyqtSignal(bool)
     playlist_toggle = pyqtSignal()
     fullscreen_toggle = pyqtSignal()
+    channels_updated = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -32,6 +33,10 @@ class EventBus(QObject):
     def emit_fullscreen_toggle(self):
         """Emit a signal to toggle fullscreen mode."""
         self.fullscreen_toggle.emit()
+
+    def emit_channels_updated(self):
+        """Emit a signal when channels are updated."""
+        self.channels_updated.emit()
 
 
 # Global EventBus instance

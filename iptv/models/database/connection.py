@@ -7,7 +7,6 @@ def create_connection(db_file):
     conn = None
     try:
         conn = sqlite3.connect(db_file)
-        print(f"Successfully connected to {db_file}")
     except Error as e:
         print(f"Error while connecting to the database: {e}")
     return conn
@@ -17,4 +16,3 @@ def close_connection(conn):
     """ Close the connection to the database """
     if conn:
         conn.close()
-        print("Connection closed")

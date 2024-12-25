@@ -22,12 +22,7 @@ def is_url_responsive(channel, timeout=5):
         response = requests.head(channel.url, timeout=timeout)
 
         # Check if the response code indicates success (200)
-        if response.status_code == 200:
-            print(f"Channel '{getattr(channel, 'name', 'Unknown')}' is online (Status Code: {response.status_code})")
-            return True
-        else:
-            print(f"Channel '{getattr(channel, 'name', 'Unknown')}' is offline (Status Code: {response.status_code})")
-            return False
+        return response.status_code == 200
 
     except requests.RequestException as e:
         # If there's any exception (timeout, connection error, etc.), the channel is considered offline
@@ -88,10 +83,8 @@ async def check_channel_async(channel, session):
     """
     async with session.get(channel.url) as response:
         if response.status != 200:
-            print(f"Offline channel: {channel.name}")
             Channel.update_channel(channel.id, {"tuned": False})
         else:
-            print(f"Online channel: {channel.name}")
             Channel.update_channel(channel.id, {"tuned": True})
 
 

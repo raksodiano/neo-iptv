@@ -27,7 +27,7 @@ class Channel:
         """ Converts the channel to a dictionary in the required JSON format. """
         return {
             "name": self.name,
-            "duration": str(self.duration),  # In case it's -1, for example.
+            "duration": str(self.duration),
             "url": self.url,
             "attributes": self.attributes,
             "extras": self.extras

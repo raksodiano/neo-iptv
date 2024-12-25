@@ -26,6 +26,25 @@ class Playlist(QWidget):
         self.playlist_model = QStandardItemModel()
         self.playlist.setModel(self.playlist_model)
 
+        # Initialize the playlist with current channels
+        self.load_channels()
+
+        # Connect the selection signal of the list to a slot
+        self.playlist.selectionModel().selectionChanged.connect(self.on_channel_selected)
+
+        # Connect to the EventBus signal for channel updates
+        event_bus.channels_updated.connect(self.on_channels_updated)
+
+        # Add the list view to the layout
+        layout.addWidget(self.playlist)
+
+        self.setLayout(layout)
+
+    def load_channels(self):
+        """ Load channels from the ChannelManager and update the playlist """
+        # Clear the model
+        self.playlist_model.clear()
+
         # Get channels from the ChannelManager singleton
         channels = ChannelManager.get_instance().get_channels()
 
@@ -38,14 +57,6 @@ class Playlist(QWidget):
             item.setData(channel.url, Qt.ItemDataRole.UserRole)  # Store the URL as additional data
             self.playlist_model.appendRow(item)
 
-        # Connect the selection signal of the list to a slot
-        self.playlist.selectionModel().selectionChanged.connect(self.on_channel_selected)
-
-        # Add the list view to the layout
-        layout.addWidget(self.playlist)
-
-        self.setLayout(layout)
-
     def update_channel_count_label(self, count):
         """ Update the label to display the count of channels """
         self.channel_count_label.setText(f"Channels count: {count}")
@@ -57,3 +68,7 @@ class Playlist(QWidget):
             selected_item = selected_index[0]
             url = selected_item.data(Qt.ItemDataRole.UserRole)
             event_bus.channel_url_changed.emit(url)
+
+    def on_channels_updated(self):
+        """ Handle the channels_updated signal from the EventBus """
+        self.load_channels()

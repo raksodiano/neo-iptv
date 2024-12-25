@@ -1,4 +1,4 @@
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -6,12 +6,11 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QSpacerItem,
     QSizePolicy,
-    QHBoxLayout,
     QProgressBar
 )
 
-from iptv.controllers.helpers import filter_responsive_channels
 from iptv.controllers.thread.channel_tuning import ChannelTuningThread
+from iptv.event_bus import event_bus
 from iptv.models.database.channel import Channel
 
 
@@ -19,7 +18,7 @@ class ChannelTab(QWidget):
     def __init__(self):
         super().__init__()
 
-        # Main layout (with margin adjustments)
+        # Main layout
         layout = QVBoxLayout()
         layout.setContentsMargins(10, 10, 10, 10)
 
@@ -68,7 +67,7 @@ class ChannelTab(QWidget):
         self.message_label.setVisible(False)
         layout.addWidget(self.message_label)
 
-        # Add a spacer to ensure that the buttons are placed together and pushed towards the bottom
+        # Add a spacer
         spacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
         layout.addItem(spacer)
 
@@ -91,7 +90,7 @@ class ChannelTab(QWidget):
 
         # Show progress bar
         self.progress_bar.setVisible(True)
-        self.progress_bar.setValue(0)  # Reset progress to 0
+        self.progress_bar.setValue(0)
 
         # Show waiting message
         self.message_label.setText("""
@@ -99,7 +98,7 @@ class ChannelTab(QWidget):
             
             This process will only hide the channels that are currently not responsive until they are tuned again. <br>
             It will not hide channels that are inaccessible due to other reasons. <br> 
-            Please note that some channels may not be active 24/7 and could disappear during a tuning.
+            Please note that some channels may not be active 24/7 and could disappear during a tuning. <br><br> 
     
             To ensure the process completes successfully, avoid closing the settings window, as it may cancel the tuning.
             """)
@@ -129,7 +128,10 @@ class ChannelTab(QWidget):
         It updates the UI to reflect the completion of the tuning process.
         """
         self.wait_label.setText("Channels tuned successfully!")
-        self.wait_label.setVisible(True)  # Show the success message
+        self.wait_label.setVisible(True)
+
+        self.message_label.setText("")
+        self.message_label.setVisible(False)
 
         # Hide the progress bar
         self.progress_bar.setVisible(False)
@@ -138,6 +140,9 @@ class ChannelTab(QWidget):
         self.load_file_button.setEnabled(True)
         self.load_url_button.setEnabled(True)
         self.tune_button.setEnabled(True)
+
+        # Emit the channels_updated signal
+        event_bus.emit_channels_updated()
 
     def load_channels_from_file(self):
         """ Placeholder for the method to load channels from a file """
