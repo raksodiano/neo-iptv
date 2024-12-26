@@ -21,7 +21,7 @@ It is recommended to install the application inside a **virtual environment** to
 conflicts with other projects. Below are the steps for setting up the environment and the app on **openSUSE**,
 **Debian**, and **Fedora**:
 
-### 1. Install dependencies (MPV, Python, and PyQt6)
+### 1. Install dependencies (Python and MPV)
 
 First, ensure that `Python 3`, `pip`, and `MPV` are installed. You can install these using the following commands:
 
