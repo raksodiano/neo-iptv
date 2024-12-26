@@ -10,24 +10,41 @@ Before running the application, ensure you have the following installed on your 
 
 - **Python 3.x**: The application was developed and tested with Python 3.
 - **MPV**: Required to stream IPTV channels.
-- **PyQt6**: For the graphical user interface (GUI).
+- **MPV development libraries**: Necessary for building and linking MPV.
 - **pip**: For installing Python dependencies.
+- **PyQt6**: For the graphical user interface (GUI).
+- **ipytv**: A Python library for handling IPTV playlists.
 
 ### Installation
 
 It is recommended to install the application inside a **virtual environment** to keep dependencies organized and avoid
-conflicts with other projects. Below are the steps for setting up the environment and the app on **openSUSE**:
+conflicts with other projects. Below are the steps for setting up the environment and the app on **openSUSE**,
+**Debian**, and **Fedora**:
 
 ### 1. Install dependencies (MPV, Python, and PyQt6)
 
-First, ensure that Python 3, `pip`, and MPV are installed. You can install these on **openSUSE** using the following
-commands:
+First, ensure that `Python 3`, `pip`, and `MPV` are installed. You can install these using the following commands:
 
-#### Install Python 3 and MPV:
+#### On openSUSE:
 
 ```bash
 sudo zypper install python3 python3-pip
 sudo zypper install mpv mpv-devel
+```
+
+#### On Debian:
+
+```bash
+sudo apt update
+sudo apt install python3 python3-pip
+sudo apt install mpv libmpv-dev
+```
+
+#### On Fedora:
+
+```bash
+sudo dnf install python3 python3-pip
+sudo dnf install mpv mpv-libs
 ```
 
 ### 2. Create and activate a virtual environment

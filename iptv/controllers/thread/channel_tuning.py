@@ -8,6 +8,18 @@ from iptv.controllers.helpers import is_url_responsive
 from iptv.models.database.channel import Channel
 
 
+def check_channel(channel):
+    """
+    Checks if a channel is responsive and updates its status in the database.
+    """
+    if not is_url_responsive(channel):
+        Channel.update_channel(channel.id, {"tuned": False})
+    else:
+        Channel.update_channel(channel.id, {"tuned": True})
+
+    return channel
+
+
 class ChannelTuningThread(QThread):
     """
     Thread class to handle the channel tuning process in background.
@@ -34,7 +46,7 @@ class ChannelTuningThread(QThread):
             batch = self.channels[i:i + batch_size]
             # Using ThreadPoolExecutor to process the batch in parallel
             with ThreadPoolExecutor(max_workers=max_workers) as executor:
-                results = list(executor.map(self.check_channel, batch))
+                results = list(executor.map(check_channel, batch))
 
             # Emit progress update after each batch
             progress = int((i + batch_size) / total_channels * 100)  # Calculate progress
@@ -45,14 +57,3 @@ class ChannelTuningThread(QThread):
 
         # Emit finished signal after all batches are processed
         self.tuning_finished.emit()
-
-    def check_channel(self, channel):
-        """
-        Checks if a channel is responsive and updates its status in the database.
-        """
-        if not is_url_responsive(channel):
-            Channel.update_channel(channel.id, {"tuned": False})
-        else:
-            Channel.update_channel(channel.id, {"tuned": True})
-            
-        return channel

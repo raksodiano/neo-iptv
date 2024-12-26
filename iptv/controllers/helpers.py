@@ -60,15 +60,13 @@ def check_channel(channel):
     :return: The channel if responsive, None if not.
     """
     if not is_url_responsive(channel):
-        print(f"Offline channel: {channel.name}")
         Channel.update_channel(channel.id, {"tuned": False})
         return None
     else:
-        print(f"Online channel: {channel.name}")
         Channel.update_channel(channel.id, {"tuned": True})
 
     # Introduce a small delay between requests
-    time.sleep(random.uniform(0.1, 0.5))  # Random delay between 100ms to 500ms
+    time.sleep(random.uniform(0.1, 0.5))
 
     return channel
 

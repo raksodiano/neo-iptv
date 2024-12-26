@@ -6,10 +6,13 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QSpacerItem,
     QSizePolicy,
-    QProgressBar
+    QProgressBar,
+    QFileDialog,
+    QMessageBox
 )
 
 from iptv.controllers.thread.channel_tuning import ChannelTuningThread
+from iptv.controllers.thread.file_loader import FileLoaderThread
 from iptv.event_bus import event_bus
 from iptv.models.database.channel import Channel
 
@@ -32,17 +35,17 @@ class ChannelTab(QWidget):
 
         # Buttons to load channels from file and URL
         self.load_file_button = QPushButton("Load Channels from File", self)
-        self.load_url_button = QPushButton("Load Channels from URL", self)
+        # self.load_url_button = QPushButton("Load Channels from URL", self)
         self.tune_button = QPushButton("Tune Channels", self)
 
         # Connect buttons to their respective methods
         self.load_file_button.clicked.connect(self.load_channels_from_file)
-        self.load_url_button.clicked.connect(self.load_channels_from_url)
+        # self.load_url_button.clicked.connect(self.load_channels_from_url)
         self.tune_button.clicked.connect(self.start_tuning)
 
         # Add buttons to the layout
         button_layout.addWidget(self.load_file_button)
-        button_layout.addWidget(self.load_url_button)
+        # button_layout.addWidget(self.load_url_button)
         button_layout.addWidget(self.tune_button)
 
         # Add the button layout to the main layout
@@ -74,11 +77,23 @@ class ChannelTab(QWidget):
         # Set the layout for the widget
         self.setLayout(layout)
 
+        self.file_loader_thread = None
+
     def start_tuning(self):
         """
         This function is called when the 'Tune Channels' button is pressed.
         It triggers the tuning process in a separate thread to avoid UI blocking.
         """
+        confirm = QMessageBox.question(
+            self,
+            "Confirm Load",
+            f"Do you want to tune the channels? This will take some time.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+
+        if confirm != QMessageBox.StandardButton.Yes:
+            return
+
         # Show waiting message and progress bar
         self.wait_label.setText("Please wait while tuning the channels...")
         self.wait_label.setVisible(True)
@@ -145,8 +160,75 @@ class ChannelTab(QWidget):
         event_bus.emit_channels_updated()
 
     def load_channels_from_file(self):
-        """ Placeholder for the method to load channels from a file """
-        print("Loading channels from file...")
+        """
+        Opens a file dialog to select an M3U or M3U8 file, and starts the loading process.
+        """
+
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select M3U/M3U8 File",
+            "",
+            "Playlist Files (*.m3u *.m3u8);;All Files (*)"
+        )
+
+        if not file_path:
+            return
+
+        confirm = QMessageBox.question(
+            self,
+            "Confirm Load",
+            f"Do you want to load channels from '{file_path}'?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+
+        if confirm != QMessageBox.StandardButton.Yes:
+            return
+
+        self.file_loader_thread = FileLoaderThread(file_path)
+        self.file_loader_thread.progress_signal.connect(self.update_progress)
+        self.file_loader_thread.completed_signal.connect(self.on_file_loading_complete)
+        self.file_loader_thread.error_signal.connect(self.on_file_loading_error)
+
+        self.wait_label.setText("Loading channels from file...")
+        self.wait_label.setVisible(True)
+
+        self.load_file_button.setEnabled(False)
+        self.load_url_button.setEnabled(False)
+        self.tune_button.setEnabled(False)
+
+        self.progress_bar.setVisible(True)
+        self.progress_bar.setValue(0)
+
+        self.file_loader_thread.start()
+
+    def on_file_loading_complete(self):
+        """
+        Handles actions after the file has been successfully loaded.
+        """
+
+        QMessageBox.information(self, "Success", "Channels loaded successfully!")
+        self.wait_label.setText("Channels loaded successfully!")
+        self.wait_label.setVisible(True)
+
+        self.load_file_button.setEnabled(True)
+        self.load_url_button.setEnabled(True)
+        self.tune_button.setEnabled(True)
+
+        self.progress_bar.setVisible(False)
+
+        event_bus.emit_channels_updated()
+
+    def on_file_loading_error(self, error_message):
+        """
+        Handles errors that occur during the file loading process.
+        """
+        QMessageBox.critical(self, "Error", f"An error occurred: {error_message}")
+
+        self.load_file_button.setEnabled(True)
+        self.load_url_button.setEnabled(True)
+        self.tune_button.setEnabled(True)
+
+        self.progress_bar.setVisible(False)
 
     def load_channels_from_url(self):
         """ Placeholder for the method to load channels from a URL """
