@@ -1,4 +1,3 @@
-import asyncio
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton
 

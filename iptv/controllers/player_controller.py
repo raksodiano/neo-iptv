@@ -6,7 +6,7 @@ from iptv.event_bus import event_bus
 def is_valid_url(url):
     """ Validate if the URL is accessible. """
     try:
-        response = requests.head(url, timeout=3)
+        response = requests.head(url, timeout=5)
         return response.status_code == 200
     except requests.exceptions.RequestException:
         return False
@@ -57,9 +57,12 @@ class PlayerController(QThread):
     def update_video_url(self, new_url: str):
         """ Handle a change in video URL."""
         if is_valid_url(new_url):
+            print(f"Channel valid: {new_url}")
             self.url = new_url
             self.player.play(new_url)
             self.playback_status_changed.emit("playing")
+        else:
+            print(f"Channel URL is not valid or accessible: {new_url}")
 
     def update_volume(self, volume: int):
         """ Handle a change in volume."""

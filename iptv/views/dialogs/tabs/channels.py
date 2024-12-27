@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
 
 from iptv.controllers.thread.channel_tuning import ChannelTuningThread
 from iptv.controllers.thread.file_loader import FileLoaderThread
+from iptv.controllers.thread.url_loader import URLLoaderThread
 from iptv.event_bus import event_bus
 from iptv.models.database.channel import Channel
 
@@ -223,6 +224,10 @@ class ChannelTab(QWidget):
         self.progress_bar.setVisible(True)
         self.progress_bar.setValue(0)
 
+        # Show waiting message
+        self.message_label.setText("Channels will be loaded from the archive, please wait.")
+        self.message_label.setVisible(True)
+
         self.file_loader_thread.start()
 
     def on_file_loading_complete(self):
@@ -234,12 +239,16 @@ class ChannelTab(QWidget):
         self.wait_label.setText("Channels loaded successfully!")
         self.wait_label.setVisible(True)
 
+        self.message_label.setText("")
+        self.message_label.setVisible(False)
+
         self.load_file_button.setEnabled(True)
         self.load_url_button.setEnabled(True)
         self.tune_button.setEnabled(True)
 
         self.progress_bar.setVisible(False)
 
+        # Emit the channels_updated signal
         event_bus.emit_channels_updated()
 
     def on_file_loading_error(self, error_message):
@@ -274,5 +283,64 @@ class ChannelTab(QWidget):
         if confirm != QMessageBox.StandardButton.Yes:
             return
 
-        # Logic to handle URL-based loading can be implemented here.
-        QMessageBox.information(self, "URL Loading", f"Channels are being loaded from: {url}")
+        self.url_input.setEnabled(False)
+        self.load_url_confirm_button.setEnabled(False)
+
+        self.url_loader_thread = URLLoaderThread(url)
+        self.url_loader_thread.progress_signal.connect(self.update_progress)
+        self.url_loader_thread.completed_signal.connect(self.on_url_loading_complete)
+        self.url_loader_thread.error_signal.connect(self.on_url_loading_error)
+
+        self.wait_label.setText("Loading channels from URL...")
+        self.wait_label.setVisible(True)
+
+        self.load_file_button.setEnabled(False)
+        self.load_url_button.setEnabled(False)
+        self.tune_button.setEnabled(False)
+
+        self.progress_bar.setVisible(True)
+        self.progress_bar.setValue(0)
+
+        # Show waiting message
+        self.message_label.setText("Channels will be loaded from the URL, please wait.")
+        self.message_label.setVisible(True)
+
+        self.url_loader_thread.start()
+
+    def on_url_loading_complete(self):
+        """
+        Handles actions after the channels have been successfully loaded from the URL.
+        """
+        QMessageBox.information(self, "Success", "Channels loaded successfully!")
+
+        self.url_input.setEnabled(True)
+        self.load_url_confirm_button.setEnabled(True)
+
+        self.wait_label.setText("Channels loaded successfully!")
+        self.wait_label.setVisible(True)
+
+        self.message_label.setText("")
+        self.message_label.setVisible(False)
+
+        self.load_file_button.setEnabled(True)
+        self.load_url_button.setEnabled(True)
+        self.tune_button.setEnabled(True)
+
+        self.progress_bar.setVisible(False)
+
+        event_bus.emit_channels_updated()
+
+    def on_url_loading_error(self, error_message):
+        """
+        Handles errors that occur during the URL loading process.
+        """
+        QMessageBox.critical(self, "Error", f"An error occurred: {error_message}")
+
+        self.url_input.setEnabled(True)
+        self.load_url_confirm_button.setEnabled(True)
+
+        self.load_file_button.setEnabled(True)
+        self.load_url_button.setEnabled(True)
+        self.tune_button.setEnabled(True)
+
+        self.progress_bar.setVisible(False)

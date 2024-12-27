@@ -9,6 +9,23 @@ import requests
 from iptv.models.database.channel import Channel
 
 
+def process_channel_entry(entry_data):
+    """
+    Processes a single channel's data from the playlist entry and inserts it into the database.
+    """
+    # Ensure the required fields exist in the entry_data
+    required_fields = {"url"}
+    if not required_fields.issubset(entry_data.keys()):
+        return "Error: Missing required fields in entry data."
+
+    # Check for duplicate channels by URL
+    if Channel.get_channel_by_url(entry_data["url"]):
+        return False
+
+    Channel.insert_channel(entry_data)
+    return True
+
+
 def is_url_responsive(channel, timeout=5):
     """
     Checks if a channel's URL is responsive within the specified timeout period.
