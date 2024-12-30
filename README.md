@@ -6,14 +6,12 @@ such as volume adjustment and playback.
 
 ## Requirements
 
-Before running the application, ensure you have the following installed on your **openSUSE** system:
+Before running the application, ensure you have the following installed on your system:
 
 - **Python 3.x**: The application was developed and tested with Python 3.
+- **PIP**: For installing Python dependencies.
 - **MPV**: Required to stream IPTV channels.
 - **MPV development libraries**: Necessary for building and linking MPV.
-- **pip**: For installing Python dependencies.
-- **PyQt6**: For the graphical user interface (GUI).
-- **ipytv**: A Python library for handling IPTV playlists.
 
 ### Installation
 
