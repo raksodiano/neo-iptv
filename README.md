@@ -26,6 +26,7 @@ First, ensure that `Python 3`, `pip`, and `MPV` are installed. You can install t
 #### On openSUSE:
 
 ```bash
+sudo zypper refresh
 sudo zypper install python3 python3-pip
 sudo zypper install mpv mpv-devel
 ```
