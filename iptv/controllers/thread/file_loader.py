@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 from PyQt6.QtCore import QThread, pyqtSignal
 from ipytv import playlist
 
+from iptv.config.logger import logger
 from iptv.controllers.helpers import process_channel_entry
 
 
@@ -30,6 +31,7 @@ class FileLoaderThread(QThread):
             pl = playlist.loadf(self.file_path)
 
             if not pl.get_channels():
+                logger.error(f"Error occurred: The file is invalid or cannot be parsed")
                 raise ValueError("The file is invalid or cannot be parsed.")
 
             # Extract the channel data from the playlist
@@ -48,6 +50,8 @@ class FileLoaderThread(QThread):
                 progress = int((i + len(batch)) / total_channels * 100)
                 self.progress_signal.emit(progress)
 
+                logger.info(f"Processed {i + len(batch)} out of {total_channels} channels ({progress}%)")
+
                 # Simulate some delay between batches
                 time.sleep(random.uniform(0.1, 0.3))
 
@@ -57,3 +61,4 @@ class FileLoaderThread(QThread):
         except Exception as e:
             # Emit an error signal if an exception occurs
             self.error_signal.emit(str(e))
+            logger.error(f"Error occurred while loading the file: {e}")

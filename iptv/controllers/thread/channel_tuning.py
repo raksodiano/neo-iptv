@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from PyQt6.QtCore import QThread, pyqtSignal
 
+from iptv.config.logger import logger
 from iptv.controllers.helpers import is_url_responsive
 from iptv.models.database.channel import Channel
 
@@ -43,11 +44,13 @@ class ChannelTuningThread(QThread):
             batch = self.channels[i:i + batch_size]
             # Using ThreadPoolExecutor to process the batch in parallel
             with ThreadPoolExecutor(max_workers=max_workers) as executor:
-                results = list(executor.map(check_channel, batch))
+                list(executor.map(check_channel, batch))
 
             # Emit progress update after each batch
             progress = int((i + batch_size) / total_channels * 100)  # Calculate progress
             self.progress_updated.emit(progress)
+
+            logger.info(f"Processed {i + len(batch)} out of {total_channels} channels ({progress}%)")
 
             # Simulate some delay between batches (for demonstration)
             time.sleep(random.uniform(0.1, 0.5))  # Random delay between 100ms and 500ms
