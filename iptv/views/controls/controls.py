@@ -1,4 +1,11 @@
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
+from PyQt6.QtWidgets import (
+    QWidget,
+    QHBoxLayout,
+    QVBoxLayout,
+    QSpacerItem,
+    QSizePolicy
+)
+
 from .navigation import Navigation
 from .settings import Settings
 from .toggle_buttones import ToggleButtons

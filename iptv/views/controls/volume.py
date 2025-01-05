@@ -1,6 +1,13 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QWidget, QSlider, QPushButton, QHBoxLayout, QSizePolicy
+from PyQt6.QtWidgets import (
+    QWidget,
+    QSlider,
+    QPushButton,
+    QHBoxLayout,
+    QSizePolicy
+)
+
 from iptv.event_bus import event_bus
 
 

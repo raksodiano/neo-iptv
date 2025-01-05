@@ -12,10 +12,7 @@ def check_channel(channel):
     """
     Checks if a channel is responsive and updates its status in the database.
     """
-    if not is_url_responsive(channel):
-        Channel.update_channel(channel.id, {"tuned": False})
-    else:
-        Channel.update_channel(channel.id, {"tuned": True})
+    Channel.update_channel(channel.id, {"tuned": is_url_responsive(channel)})
 
     return channel
 

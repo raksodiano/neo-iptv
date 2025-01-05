@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QDialog, QVBoxLayout, QTabWidget, QWidget, QPushButton, QLabel
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QTabWidget
 
 from iptv.views.dialogs.tabs.advance import AdvanceTab
 from iptv.views.dialogs.tabs.channels import ChannelTab

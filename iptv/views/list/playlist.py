@@ -1,6 +1,13 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QStandardItem, QStandardItemModel
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QListView, QAbstractItemView, QLabel
+from PyQt6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QListView,
+    QAbstractItemView,
+    QLabel
+)
+
 from iptv.event_bus import event_bus
 from iptv.models.channel_manager import ChannelManager
 
@@ -22,7 +29,7 @@ class Playlist(QWidget):
         self.playlist = QListView(self)
         self.playlist.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
-        # Create the item model (QStandardItemModel)
+        # Create the item model
         self.playlist_model = QStandardItemModel()
         self.playlist.setModel(self.playlist_model)
 
@@ -47,6 +54,8 @@ class Playlist(QWidget):
 
         # Get channels from the ChannelManager
         channels = ChannelManager.get_instance().channels
+
+        print(f"Channels Playlist: {len(channels)}")
 
         # Update the label with the count of channels
         self.update_channel_count_label(len(channels))

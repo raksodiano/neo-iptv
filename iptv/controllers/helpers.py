@@ -76,11 +76,10 @@ def check_channel(channel):
     :param channel: The channel to test.
     :return: The channel if responsive, None if not.
     """
+    Channel.update_channel(channel.id, {"tuned": is_url_responsive(channel)})
+
     if not is_url_responsive(channel):
-        Channel.update_channel(channel.id, {"tuned": False})
         return None
-    else:
-        Channel.update_channel(channel.id, {"tuned": True})
 
     # Introduce a small delay between requests
     time.sleep(random.uniform(0.1, 0.5))

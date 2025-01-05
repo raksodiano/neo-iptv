@@ -1,4 +1,5 @@
 import json
+
 from .connection import create_connection
 
 # Global variable for database path

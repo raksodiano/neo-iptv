@@ -1,5 +1,5 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QListView
 from PyQt6.QtCore import QStringListModel
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QListView
 
 
 class Resources(QWidget):

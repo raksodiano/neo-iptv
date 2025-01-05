@@ -1,8 +1,8 @@
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QMessageBox
-from iptv.controllers.player_controller import PlayerController
 from mpv import MPV
 
+from iptv.controllers.player_controller import PlayerController
 from iptv.models.channel_manager import ChannelManager
 
 

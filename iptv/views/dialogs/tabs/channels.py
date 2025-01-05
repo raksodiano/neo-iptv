@@ -25,6 +25,8 @@ class ChannelTab(QWidget):
         super().__init__()
 
         # Main layout
+        self.tuning_thread = None
+        self.url_loader_thread = None
         layout = QVBoxLayout()
         layout.setContentsMargins(10, 10, 10, 10)
 
@@ -33,7 +35,7 @@ class ChannelTab(QWidget):
         self.label.setAlignment(Qt.AlignmentFlag.AlignTop)
         layout.addWidget(self.label)
 
-        # Layout for buttons (vertical alignment)
+        # Layout for buttons
         button_layout = QVBoxLayout()
 
         # Buttons to load channels from file and URL
@@ -313,8 +315,8 @@ class ChannelTab(QWidget):
         """
         QMessageBox.information(self, "Success", "Channels loaded successfully!")
 
-        self.url_input.setEnabled(True)
-        self.load_url_confirm_button.setEnabled(True)
+        self.url_input.setVisible(False)
+        self.load_url_confirm_button.setVisible(False)
 
         self.wait_label.setText("Channels loaded successfully!")
         self.wait_label.setVisible(True)

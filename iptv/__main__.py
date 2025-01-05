@@ -3,6 +3,7 @@ import os
 import sys
 
 from PyQt6.QtWidgets import QApplication
+
 from iptv.models.channel_manager import ChannelManager
 from iptv.models.database.channel import Channel
 from iptv.views.main_window import MainWindow
@@ -15,6 +16,8 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 def main():
     # Create the database
     Channel.create_table()
+
+    # Load channels
     ChannelManager.get_instance().channels
 
     # Create the application

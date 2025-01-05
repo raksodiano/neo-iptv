@@ -1,9 +1,9 @@
 from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QHBoxLayout
 
+from iptv.event_bus import event_bus
 from .controls.controls import Controls
 from .list.playlist import Playlist
 from .video.player import Player
-from iptv.event_bus import event_bus
 
 
 class MainWindow(QMainWindow):
