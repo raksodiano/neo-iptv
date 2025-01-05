@@ -12,17 +12,10 @@ locale.setlocale(locale.LC_NUMERIC, 'C')
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 
-def initialize_channels():
-    channel_manager = ChannelManager.get_instance()
-    channels = channel_manager.get_channels()
-    print(f"Loaded {len(channels)} channels.")
-    return channels
-
-
 def main():
     # Create the database
     Channel.create_table()
-    initialize_channels()
+    ChannelManager.get_instance().channels
 
     # Create the application
     app = QApplication(sys.argv)

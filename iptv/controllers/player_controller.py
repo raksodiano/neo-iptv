@@ -1,6 +1,8 @@
 import requests
 from PyQt6.QtCore import QThread, pyqtSignal
+
 from iptv.event_bus import event_bus
+from iptv.models.channel_manager import ChannelManager
 
 
 def is_valid_url(url):
@@ -58,6 +60,7 @@ class PlayerController(QThread):
         """ Handle a change in video URL."""
         if is_valid_url(new_url):
             print(f"Channel valid: {new_url}")
+            ChannelManager.get_instance().set_current_channel(new_url)
             self.url = new_url
             self.player.play(new_url)
             self.playback_status_changed.emit("playing")

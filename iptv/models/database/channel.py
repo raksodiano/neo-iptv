@@ -1,5 +1,8 @@
 import json
-from .connection import create_connection, close_connection
+from .connection import create_connection
+
+# Global variable for database path
+DATABASE_PATH = "iptv.db"
 
 
 class Channel:
@@ -21,7 +24,7 @@ class Channel:
         self.extras = extras or []
 
     def __repr__(self):
-        return f"<Channel(name={self.name}, url={self.url})>"
+        return f"<Channel(id={self.id}, name={self.name}, url={self.url}, attributes={self.attributes}, extras={self.extras})>"
 
     def to_dict(self):
         """ Converts the channel to a dictionary in the required JSON format. """
@@ -34,11 +37,19 @@ class Channel:
         }
 
     @staticmethod
+    def _execute_query(query, params=(), fetch=False):
+        """ Helper method to manage database connections and execute queries. """
+        with create_connection(DATABASE_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, params)
+            if fetch:
+                return cursor.fetchall()
+            conn.commit()
+
+    @staticmethod
     def create_table():
         """ Creates the channels table in the database if it doesn't exist. """
-        conn = create_connection("iptv.db")
-        cursor = conn.cursor()
-        cursor.execute("""
+        sql_query = """
             CREATE TABLE IF NOT EXISTS channels (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
@@ -50,13 +61,14 @@ class Channel:
                 favorite BOOLEAN DEFAULT 0,
                 last BOOLEAN DEFAULT 0
             )
-        """)
-        conn.commit()
-        close_connection(conn)
+        """
+        Channel._execute_query(sql_query)
 
     @staticmethod
     def insert_channel(channel_data):
-        """Inserts a new channel into the database using dynamic columns based on the provided object (dictionary or class)."""
+        """
+        Inserts a new channel into the database using dynamic columns based on the provided object.
+        """
         if isinstance(channel_data, dict):
             fields = channel_data
         elif hasattr(channel_data, '__dict__'):
@@ -65,142 +77,87 @@ class Channel:
             raise TypeError("Provided data must be either a dictionary or an object with attributes.")
 
         filtered_fields = {k: v for k, v in fields.items() if v is not None}
-
-        if 'attributes' in filtered_fields and isinstance(filtered_fields['attributes'], (dict, list)):
-            filtered_fields['attributes'] = json.dumps(filtered_fields['attributes'])
-        if 'extras' in filtered_fields and isinstance(filtered_fields['extras'], (dict, list)):
-            filtered_fields['extras'] = json.dumps(filtered_fields['extras'])
+        Channel._serialize_json_fields(filtered_fields)
 
         columns = ', '.join(filtered_fields.keys())
         placeholders = ', '.join(['?'] * len(filtered_fields))
         values = tuple(filtered_fields.values())
 
-        sql_query = f"""
-            INSERT INTO channels ({columns})
-            VALUES ({placeholders})
-        """
+        sql_query = f"INSERT INTO channels ({columns}) VALUES ({placeholders})"
+        Channel._execute_query(sql_query, values)
 
-        conn = create_connection("iptv.db")
-        cursor = conn.cursor()
+    @staticmethod
+    def _serialize_json_fields(fields):
+        """ Serializes 'attributes' and 'extras' fields if they are in the provided dictionary. """
+        for key in ['attributes', 'extras']:
+            if key in fields and isinstance(fields[key], (dict, list)):
+                fields[key] = json.dumps(fields[key])
 
-        cursor.execute(sql_query, values)
-        conn.commit()
-        close_connection(conn)
+    @staticmethod
+    def _deserialize_json_fields(row):
+        """ Deserializes 'attributes' and 'extras' fields from JSON strings. """
+        return Channel(
+            id=row[0],
+            name=row[1],
+            url=row[2],
+            duration=row[3],
+            attributes=json.loads(row[4]) if row[4] else {},
+            extras=json.loads(row[5]) if row[5] else []
+        )
 
     @staticmethod
     def get_all_channels():
         """ Retrieves all channels from the database that are marked as 'tuned' (tuned = 1). """
-        conn = create_connection("iptv.db")
-        cursor = conn.cursor()
+        sql_query = "SELECT * FROM channels WHERE tuned = 1 ORDER BY name ASC"
+        rows = Channel._execute_query(sql_query, fetch=True)
 
-        cursor.execute("SELECT * FROM channels WHERE tuned = 1")
-        rows = cursor.fetchall()
-
-        conn.close()
-
-        return [
-            Channel(
-                id=row[0],
-                name=row[1],
-                url=row[2],
-                duration=row[3],
-                attributes=json.loads(row[4]) if row[4] else {},  # attributes
-                extras=json.loads(row[5]) if row[5] else []  # extras
-            )
-            for row in rows
-        ]
+        return [Channel._deserialize_json_fields(row) for row in rows]
 
     @staticmethod
     def get_all_channels_without_filters():
         """ Retrieves all channels from the database. """
-        conn = create_connection("iptv.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM channels")
-        rows = cursor.fetchall()
-        close_connection(conn)
+        sql_query = "SELECT * FROM channels"
+        rows = Channel._execute_query(sql_query, fetch=True)
 
-        # Convert the results to Channel objects and deserialize attributes and extras.
-        return [
-            Channel(
-                id=row[0],  # id
-                name=row[1],  # name
-                url=row[2],  # url
-                duration=row[3],  # duration
-                attributes=json.loads(row[4]) if row[4] else {},  # attributes
-                extras=json.loads(row[5]) if row[5] else []  # extras
-            )
-            for row in rows
-        ]
+        return [Channel._deserialize_json_fields(row) for row in rows]
 
     @staticmethod
     def get_channel_by_id(channel_id):
         """ Retrieves a channel by its ID. """
-        conn = create_connection("iptv.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM channels WHERE id=?", (channel_id,))
-        row = cursor.fetchone()
-        close_connection(conn)
+        sql_query = "SELECT * FROM channels WHERE id=?"
+        row = Channel._execute_query(sql_query, (channel_id,), fetch=True)
 
         if row:
-            return Channel(
-                id=row[0],  # id
-                name=row[1],  # name
-                url=row[2],  # url
-                duration=row[3],  # duration
-                attributes=json.loads(row[4]) if row[4] else {},  # attributes
-                extras=json.loads(row[5]) if row[5] else []  # extras
-            )
+            return Channel._deserialize_json_fields(row[0])
         return None
 
     @staticmethod
     def get_channel_by_url(channel_url):
         """ Retrieves a channel by its URL. """
-        conn = create_connection("iptv.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM channels WHERE url=?", (channel_url,))
-        row = cursor.fetchone()
-        close_connection(conn)
+        sql_query = "SELECT * FROM channels WHERE url=?"
+        row = Channel._execute_query(sql_query, (channel_url,), fetch=True)
 
         if row:
-            return Channel(
-                id=row[0],  # id
-                name=row[1],  # name
-                url=row[2],  # url
-                duration=row[3],  # duration
-                attributes=json.loads(row[4]) if row[4] else {},  # attributes
-                extras=json.loads(row[5]) if row[5] else []  # extras
-            )
+            return Channel._deserialize_json_fields(row[0])
         return None
 
     @staticmethod
     def update_channel(channel_id, update_data):
         """ Updates a channel in the database with new values. """
-        if not isinstance(update_data, dict):
-            print("Error: The update_data parameter must be a dictionary.")
+        if not isinstance(update_data, dict) or not update_data:
+            print("Error: The update_data parameter must be a non-empty dictionary.")
             return
 
-        if not update_data:
-            print("No fields to update.")
-            return
-
-        # Create the UPDATE query
         set_clause = ", ".join([f"{field} = ?" for field in update_data])
         values = list(update_data.values()) + [channel_id]
 
-        conn = create_connection("iptv.db")
-        cursor = conn.cursor()
-
-        # Execute the UPDATE query
-        cursor.execute(f"UPDATE channels SET {set_clause} WHERE id = ?", tuple(values))
-        conn.commit()
-        close_connection(conn)
+        sql_query = f"UPDATE channels SET {set_clause} WHERE id = ?"
+        Channel._execute_query(sql_query, tuple(values))
 
     @staticmethod
     def delete_channel(channel_id):
         """ Deletes a channel from the database by its ID. """
-        conn = create_connection("iptv.db")
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM channels WHERE id=?", (channel_id,))
-        conn.commit()
-        close_connection(conn)
+        sql_query = "DELETE FROM channels WHERE id=?"
+        Channel._execute_query(sql_query, (channel_id,))
+
         print(f"Channel with ID {channel_id} deleted successfully.")

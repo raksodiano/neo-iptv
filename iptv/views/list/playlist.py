@@ -45,8 +45,8 @@ class Playlist(QWidget):
         # Clear the model
         self.playlist_model.clear()
 
-        # Get channels from the ChannelManager singleton
-        channels = ChannelManager.get_instance().get_channels()
+        # Get channels from the ChannelManager
+        channels = ChannelManager.get_instance().channels
 
         # Update the label with the count of channels
         self.update_channel_count_label(len(channels))
@@ -71,4 +71,6 @@ class Playlist(QWidget):
 
     def on_channels_updated(self):
         """ Handle the channels_updated signal from the EventBus """
+        print("Channels updated signal received.")
+        ChannelManager.get_instance().refresh()
         self.load_channels()

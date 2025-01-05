@@ -6,15 +6,21 @@ from mpv import MPV
 from iptv.models.channel_manager import ChannelManager
 
 
+def log_output(level, prefix, message):
+    """ Handle logs from MPV. """
+    print(f"[{level}] {message}")
+
+
 class Player(QWidget):
     def __init__(self):
         super().__init__()
 
         # Main layout
+        self.controller = None
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        # Create a QLabel for displaying video (MPV will render into this widget)
+        # Create a QLabel for displaying video
         self.loading_label = QLabel("Channel content will be displayed here", self)
         self.loading_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.loading_label)
@@ -22,13 +28,13 @@ class Player(QWidget):
         # Initialize the MPV player
         self.player = MPV(
             wid=str(int(self.winId())),
-            log_handler=self.log_output,
+            log_handler=log_output,
         )
 
         # Set the layout for the widget
         self.setLayout(layout)
 
-        channel = ChannelManager.get_instance().get_current_channel()
+        channel = ChannelManager.get_instance().current_channel
 
         # Start the video with the given URL
         if channel is None:
@@ -61,10 +67,6 @@ class Player(QWidget):
     def show_loading_label(self):
         """ Show the loading label. """
         self.loading_label.setVisible(True)
-
-    def log_output(self, level, prefix, message):
-        """ Handle logs from MPV (optional for debugging). """
-        print(f"[{level}] {message}")
 
     def show_error_message(self, message):
         """ Show an error message box in case of issues. """
