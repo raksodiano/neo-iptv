@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 import aiohttp
 import requests
 
+from iptv.config.logger import logger
 from iptv.models.database.channel import Channel
 
 
@@ -43,7 +44,7 @@ def is_url_responsive(channel, timeout=5):
 
     except requests.RequestException as e:
         # If there's any exception (timeout, connection error, etc.), the channel is considered offline
-        print(f"Error checking channel '{getattr(channel, 'name', 'Unknown')}': {e}")
+        logger.error(f"Error checking channel '{getattr(channel, 'name', 'Unknown')}': {e}")
         return False
 
 

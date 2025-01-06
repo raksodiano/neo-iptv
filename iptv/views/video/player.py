@@ -2,13 +2,14 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QMessageBox
 from mpv import MPV
 
+from iptv.config.logger import logger
 from iptv.controllers.player_controller import PlayerController
 from iptv.models.channel_manager import ChannelManager
 
 
 def log_output(level, prefix, message):
     """ Handle logs from MPV. """
-    print(f"[{level}] {message}")
+    logger.debug(f"[{level}] {message}")
 
 
 class Player(QWidget):
@@ -38,7 +39,7 @@ class Player(QWidget):
 
         # Start the video with the given URL
         if channel is None:
-            print("No channels available or the channels are not loaded correctly.")
+            logger.info("No channels available or the channels are not loaded correctly.")
         else:
             self.start_video(channel.url)
 

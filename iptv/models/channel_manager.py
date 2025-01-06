@@ -1,4 +1,5 @@
 from .database.channel import Channel
+from ..config.logger import logger
 
 
 class ChannelManager:
@@ -17,7 +18,7 @@ class ChannelManager:
     def channels(self):
         """ Get the loaded channels, or load them if not loaded yet """
         if self._channels is None:
-            print("Loading channels from database...")
+            logger.info("Loading channels from database...")
             self._channels = Channel.get_all_channels()
         return self._channels
 
@@ -31,10 +32,12 @@ class ChannelManager:
     def current_channel(self):
         """ Get the current channel object """
         if not self._channels:
-            print("No channels loaded")
+            logger.info("No channels loaded")
             return None
+
         if self._current_channel is None:
             self._current_channel = self._channels[0]
+
         return self._current_channel
 
     def set_current_channel(self, channel_url):
@@ -57,7 +60,7 @@ class ChannelManager:
             (index for index, channel in enumerate(self._channels) if channel.id == current_channel_id), None)
 
         if current_position is None:
-            print("Current channel not found in the channel list")
+            logger.info("Current channel not found in the channel list")
             return None
 
         # Calculate the new position
@@ -79,7 +82,8 @@ class ChannelManager:
     def get_first_channel(self):
         """ Get the first channel in the list and set it as the current channel """
         if not self._channels:
-            print("No channels available")
+            logger.info("No channels available")
             return None
+
         self._current_channel = self._channels[0]
         return self._current_channel

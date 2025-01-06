@@ -1,6 +1,7 @@
 import requests
 from PyQt6.QtCore import QThread, pyqtSignal
 
+from iptv.config.logger import logger
 from iptv.event_bus import event_bus
 from iptv.models.channel_manager import ChannelManager
 
@@ -42,6 +43,7 @@ class PlayerController(QThread):
             else:
                 self.playback_error.emit("Invalid URL")
         except Exception as e:
+            logger.error(f"Error: {e}")
             self.playback_error.emit(f"Error: {str(e)}")
 
     def stop_video(self):
@@ -50,6 +52,7 @@ class PlayerController(QThread):
             self.player.stop()
             self.playback_status_changed.emit("stopped")
         except Exception as e:
+            logger.error(f"Error: {e}")
             self.playback_error.emit(f"Error: {str(e)}")
 
     def on_playback_status_change(self, name, value):
@@ -59,13 +62,13 @@ class PlayerController(QThread):
     def update_video_url(self, new_url: str):
         """ Handle a change in video URL."""
         if is_valid_url(new_url):
-            print(f"Channel valid: {new_url}")
+            logger.info(f"New Channel: {new_url}")
             ChannelManager.get_instance().set_current_channel(new_url)
             self.url = new_url
             self.player.play(new_url)
             self.playback_status_changed.emit("playing")
         else:
-            print(f"Channel URL is not valid or accessible: {new_url}")
+            logger.info(f"Channel URL is not valid or accessible: {new_url}")
 
     def update_volume(self, volume: int):
         """ Handle a change in volume."""

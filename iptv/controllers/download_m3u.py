@@ -5,14 +5,8 @@ import requests
 from PyQt6.QtCore import QThread, pyqtSignal
 from ipytv import playlist
 
+from iptv.config.logger import logger
 from iptv.models.database.channel import Channel
-
-# Configure logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 
 class DownloadM3U(QThread):
@@ -53,7 +47,8 @@ class DownloadM3U(QThread):
             # Emit the result to be processed in the main UI
             self.finished.emit((valid_channels, invalid_channels))
             logger.info(
-                f"Finished processing. Valid channels: {len(valid_channels)}, Invalid channels: {len(invalid_channels)}")
+                f"Finished processing. Valid channels: {len(valid_channels)}, Invalid channels: {len(invalid_channels)}"
+            )
 
         except requests.exceptions.RequestException as e:
             logger.error(f"Request error while downloading M3U URL: {e}")
@@ -79,15 +74,15 @@ class DownloadM3U(QThread):
             for channel_url in channels:
                 existing_channel = session.query(Channel).filter_by(url=channel_url).first()
                 if existing_channel:
-                    print(f"Channel {channel_url} already exists in the database.")
+                    logger.info(f"Channel {channel_url} already exists in the database.")
                 else:
                     channel = Channel(url=channel_url)
                     session.add(channel)
 
             session.commit()
-            print(f"Successfully added {len(channels)} channels to the database.")
+            logger.info(f"Successfully added {len(channels)} channels to the database.")
         except Exception as e:
             session.rollback()
-            print(f"Error adding channels to the database: {e}")
+            logger.error(f"Error adding channels to the database: {e}")
         finally:
             session.close()

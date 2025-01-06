@@ -1,6 +1,6 @@
 import logging
-import time
 import os
+import time
 from logging.handlers import TimedRotatingFileHandler
 
 LOG_DIR = "logs"
@@ -9,7 +9,6 @@ MAX_LOG_AGE_DAYS = 15
 
 class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
     def __init__(self, filename, when="midnight", interval=1, backupCount=7, encoding=None, delay=False, utc=False):
-        # Initialize the base handler
         super().__init__(filename, when, interval, backupCount, encoding, delay, utc)
 
     def doRollover(self):
@@ -37,7 +36,7 @@ def delete_old_logs():
             # Get the file's last modification time
             file_age_days = (current_time - os.path.getmtime(file_path)) / (60 * 60 * 24)
             if file_age_days > MAX_LOG_AGE_DAYS:
-                print(f"Deleting old log file: {file_path}")
+                logger.info(f"Deleting old log file: {file_path}")
                 os.remove(file_path)
 
 

@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import (
     QLabel
 )
 
+from iptv.config.logger import logger
 from iptv.event_bus import event_bus
 from iptv.models.channel_manager import ChannelManager
 
@@ -55,7 +56,7 @@ class Playlist(QWidget):
         # Get channels from the ChannelManager
         channels = ChannelManager.get_instance().channels
 
-        print(f"Channels Playlist: {len(channels)}")
+        logger.info(f"Channels Playlist: {len(channels)}")
 
         # Update the label with the count of channels
         self.update_channel_count_label(len(channels))
@@ -80,6 +81,6 @@ class Playlist(QWidget):
 
     def on_channels_updated(self):
         """ Handle the channels_updated signal from the EventBus """
-        print("Channels updated signal received.")
+        logger.info("Channels updated signal received.")
         ChannelManager.get_instance().refresh()
         self.load_channels()

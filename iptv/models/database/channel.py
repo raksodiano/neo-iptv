@@ -1,6 +1,7 @@
 import json
 
 from .connection import create_connection
+from ...config.logger import logger
 
 # Global variable for database path
 DATABASE_PATH = "iptv.db"
@@ -146,7 +147,7 @@ class Channel:
     def update_channel(channel_id, update_data):
         """ Updates a channel in the database with new values. """
         if not isinstance(update_data, dict) or not update_data:
-            print("Error: The update_data parameter must be a non-empty dictionary.")
+            logger.error("Error: The update_data parameter must be a non-empty dictionary.")
             return
 
         set_clause = ", ".join([f"{field} = ?" for field in update_data])
@@ -160,5 +161,3 @@ class Channel:
         """ Deletes a channel from the database by its ID. """
         sql_query = "DELETE FROM channels WHERE id=?"
         Channel._execute_query(sql_query, (channel_id,))
-
-        print(f"Channel with ID {channel_id} deleted successfully.")

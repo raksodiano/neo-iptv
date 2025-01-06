@@ -13,6 +13,8 @@ from PyQt6.QtWidgets import (
     QFileDialog
 )
 
+from iptv.config.logger import logger
+
 
 class StreamToTextEdit(QObject):
     """ Redirects print() output to a QTextEdit widget """
@@ -63,12 +65,20 @@ class DownloadM3UThread(QThread):
             self.new_message.emit(f"Error: {str(e)}\n")
 
 
+def append_message(message):
+    """ This function is called each time the thread sends a message """
+    print(message)
+
+
 class LoadChannelsDialog(QDialog):
     """ Dialog for loading IPTV channels """
 
     def __init__(self):
         super().__init__()
 
+        self.load_button = None
+        self.url_input = None
+        self.download_thread = None
         self.setWindowTitle("Load Channels")
         self.setFixedSize(400, 350)
 
@@ -136,16 +146,12 @@ class LoadChannelsDialog(QDialog):
         """ Processes the entered URL and loads the M3U data in a separate thread. """
         url = self.url_input.text().strip()
         if url:
-            print(f"Starting download from URL: {url}")
+            logger.info(f"Starting download from URL: {url}")
             self.download_thread = DownloadM3UThread(url)
-            self.download_thread.new_message.connect(self.append_message)
+            self.download_thread.new_message.connect(append_message)
             self.download_thread.start()
 
         self.url_input.setVisible(False)
-
-    def append_message(self, message):
-        """ This function is called each time the thread sends a message """
-        print(message)
 
     def load_m3u_file(self):
         """ Opens a dialog to load an M3U file and process it. """
